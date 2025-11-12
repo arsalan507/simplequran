@@ -9,7 +9,16 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  // Only allow POST requests
+  // Handle GET requests for webhook validation (Instamojo testing tool)
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      success: true,
+      message: 'Webhook endpoint is active',
+      endpoint: '/api/webhook-instamojo'
+    });
+  }
+
+  // Only allow POST requests for actual webhooks
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
