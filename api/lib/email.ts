@@ -29,7 +29,7 @@ export async function sendDownloadEmail(
       email: FROM_EMAIL,
       name: FROM_NAME,
     },
-    subject: '🎉 Your Simple Quran E-Books - Download Links Inside',
+    subject: 'Your Simple Quran Order Confirmation - Download Your E-Books',
     html: generateEmailHTML(customerName, paymentId, downloadUrl),
     text: generateEmailText(customerName, paymentId, downloadUrl),
   };
