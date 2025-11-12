@@ -16,10 +16,14 @@ export default async function handler(
       return res.status(400).json({ error: 'Email is required' });
     }
 
+    // Generate a test download URL
+    const testDownloadUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://simplequran.in'}/api/download?token=test_token_${Date.now()}`;
+
     await sendDownloadEmail(
       email,
       name || 'Valued Customer',
-      'TEST_' + Date.now()
+      'TEST_' + Date.now(),
+      testDownloadUrl
     );
 
     return res.status(200).json({
@@ -28,6 +32,10 @@ export default async function handler(
     });
   } catch (error: any) {
     console.error('Test email error:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('Full error:', JSON.stringify(error, null, 2));
+    return res.status(500).json({
+      error: error.message,
+      details: error.response?.body || error
+    });
   }
 }

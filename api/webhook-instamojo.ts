@@ -90,11 +90,18 @@ export default async function handler(
 
       // Send email with secure download link
       try {
+        console.log(`Attempting to send email to ${buyer_email}...`);
+        console.log(`Download URL: ${downloadUrl}`);
+
         await sendDownloadEmail(buyer_email, buyer_name, payment_id, downloadUrl);
-        console.log(`Email sent successfully to ${buyer_email}`);
+        console.log(`✅ Email sent successfully to ${buyer_email}`);
       } catch (emailError: any) {
-        console.error('Error sending email:', emailError);
+        console.error('❌ Error sending email:', emailError);
+        console.error('Email error details:', JSON.stringify(emailError.response?.body || emailError, null, 2));
+        console.error('Buyer email:', buyer_email);
+        console.error('Buyer name:', buyer_name);
         // Don't fail the webhook if email fails - we can retry manually
+        // Log the error so we can investigate and resend manually
       }
 
       // TODO: Store order in database (optional)
