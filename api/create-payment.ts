@@ -82,6 +82,7 @@ export default async function handler(
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const redirectUrl = `${protocol}://${host}/payment-success`;
+    const webhookUrl = `${protocol}://${host}/api/webhook-instamojo`;
 
     console.log('Creating payment request:', {
       email,
@@ -89,6 +90,7 @@ export default async function handler(
       phone: formattedPhone,
       amount: productPrice,
       redirectUrl,
+      webhookUrl,
       apiUrl: INSTAMOJO_API_URL,
       purpose: productName,
     });
@@ -107,7 +109,7 @@ export default async function handler(
         send_email: true,
         send_sms: false,
         allow_repeated_payments: false,
-        // webhook: `${protocol}://${host}/api/payment-webhook`, // Uncomment if you add webhook handler
+        webhook: webhookUrl,
       },
       {
         headers: {
