@@ -418,3 +418,294 @@ www.simplequran.in
 © 2025 Simple Quran. All rights reserved.
   `.trim();
 }
+
+/**
+ * Send hardcopy enquiry email to support
+ */
+export async function sendEnquiryEmail(enquiryData: {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  quantity: string;
+  message: string;
+}) {
+  if (!SENDGRID_API_KEY) {
+    console.error('SendGrid API key not configured');
+    throw new Error('Email service not configured');
+  }
+
+  const totalPrice = 3500 * parseInt(enquiryData.quantity);
+
+  const msg = {
+    to: 'support@simplequran.in',
+    from: {
+      email: FROM_EMAIL,
+      name: FROM_NAME,
+    },
+    replyTo: enquiryData.email,
+    subject: `🔔 New Hardcopy Enquiry from ${enquiryData.name}`,
+    html: generateEnquiryHTML(enquiryData, totalPrice),
+    text: generateEnquiryText(enquiryData, totalPrice),
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log(`Enquiry email sent successfully from ${enquiryData.email}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error sending enquiry email:', error.response?.body || error);
+    throw error;
+  }
+}
+
+function generateEnquiryHTML(
+  data: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    quantity: string;
+    message: string;
+  },
+  totalPrice: number
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          background-color: #f5f5f5;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 20px auto;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+          background: linear-gradient(135deg, #006B4E 0%, #059669 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 24px;
+        }
+        .content {
+          padding: 30px;
+        }
+        .section {
+          margin-bottom: 25px;
+        }
+        .section h2 {
+          color: #006B4E;
+          font-size: 18px;
+          margin-bottom: 15px;
+          padding-bottom: 10px;
+          border-bottom: 2px solid #059669;
+        }
+        .info-row {
+          display: flex;
+          padding: 10px 0;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child {
+          border-bottom: none;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #374151;
+          width: 140px;
+          flex-shrink: 0;
+        }
+        .info-value {
+          color: #6b7280;
+        }
+        .highlight-box {
+          background: #fef3c7;
+          border-left: 4px solid #f59e0b;
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 4px;
+        }
+        .price-box {
+          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+          border: 2px solid #10b981;
+          border-radius: 8px;
+          padding: 20px;
+          text-align: center;
+          margin: 20px 0;
+        }
+        .price-box .amount {
+          font-size: 32px;
+          font-weight: bold;
+          color: #006B4E;
+        }
+        .footer {
+          background: #f3f4f6;
+          padding: 20px;
+          text-align: center;
+          font-size: 14px;
+          color: #6b7280;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>📦 New Hardcopy Enquiry</h1>
+          <p>SimpleQuran - Physical Book Order</p>
+        </div>
+
+        <div class="content">
+          <div class="section">
+            <h2>👤 Customer Information</h2>
+            <div class="info-row">
+              <span class="info-label">Name:</span>
+              <span class="info-value">${data.name}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Email:</span>
+              <span class="info-value"><a href="mailto:${data.email}">${data.email}</a></span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone:</span>
+              <span class="info-value"><a href="tel:${data.phone}">${data.phone}</a></span>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>📍 Delivery Address</h2>
+            <div class="info-row">
+              <span class="info-label">Address:</span>
+              <span class="info-value">${data.address}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">City:</span>
+              <span class="info-value">${data.city}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">State:</span>
+              <span class="info-value">${data.state}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Pincode:</span>
+              <span class="info-value">${data.pincode}</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>📦 Order Details</h2>
+            <div class="info-row">
+              <span class="info-label">Quantity:</span>
+              <span class="info-value">${data.quantity} ${parseInt(data.quantity) === 1 ? 'copy' : 'copies'}</span>
+            </div>
+            <div class="price-box">
+              <p style="margin: 0 0 10px 0; color: #374151; font-weight: 600;">Total Amount</p>
+              <div class="amount">₹${totalPrice.toLocaleString('en-IN')}</div>
+              <p style="margin: 10px 0 0 0; font-size: 14px; color: #6b7280;">
+                (${data.quantity} × ₹3,500)
+              </p>
+            </div>
+          </div>
+
+          ${data.message ? `
+          <div class="section">
+            <h2>💬 Additional Message</h2>
+            <div class="highlight-box">
+              ${data.message}
+            </div>
+          </div>
+          ` : ''}
+
+          <div class="section">
+            <h2>⏱️ Timestamp</h2>
+            <div class="info-row">
+              <span class="info-label">Received on:</span>
+              <span class="info-value">${new Date().toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                dateStyle: 'full',
+                timeStyle: 'long'
+              })}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p><strong>Action Required:</strong> Please contact the customer within 24 hours to confirm availability and payment details.</p>
+          <p style="margin-top: 10px;">SimpleQuran Support System</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateEnquiryText(
+  data: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    quantity: string;
+    message: string;
+  },
+  totalPrice: number
+): string {
+  return `
+NEW HARDCOPY ENQUIRY - SIMPLEQURAN
+=====================================
+
+CUSTOMER INFORMATION
+--------------------
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone}
+
+DELIVERY ADDRESS
+----------------
+${data.address}
+${data.city}, ${data.state} - ${data.pincode}
+
+ORDER DETAILS
+-------------
+Quantity: ${data.quantity} ${parseInt(data.quantity) === 1 ? 'copy' : 'copies'}
+Total Amount: ₹${totalPrice.toLocaleString('en-IN')}
+
+${data.message ? `ADDITIONAL MESSAGE
+------------------
+${data.message}
+
+` : ''}TIMESTAMP
+---------
+Received on: ${new Date().toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  dateStyle: 'full',
+  timeStyle: 'long'
+})}
+
+=====================================
+ACTION REQUIRED: Please contact the customer within 24 hours
+to confirm availability and payment details.
+  `.trim();
+}

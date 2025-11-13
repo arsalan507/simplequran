@@ -28,42 +28,27 @@ const HardcopyEnquiryForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus('idle');
 
     try {
-      // Send enquiry email to support@simplequran.in
-      const emailBody = `
-Hardcopy Enquiry - SimpleQuran
+      // Send enquiry to API endpoint
+      const response = await fetch('/api/hardcopy-enquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-Customer Details:
------------------
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.phone}
+      const data = await response.json();
 
-Delivery Address:
------------------
-${formData.address}
-${formData.city}, ${formData.state} - ${formData.pincode}
-
-Order Details:
---------------
-Quantity: ${formData.quantity} copy/copies
-Price: ₹${3500 * parseInt(formData.quantity)}
-
-Additional Message:
--------------------
-${formData.message || 'None'}
-      `.trim();
-
-      // Create mailto link
-      const mailtoLink = `mailto:support@simplequran.in?subject=Hardcopy Enquiry - ${formData.name}&body=${encodeURIComponent(emailBody)}`;
-
-      // Open email client
-      window.location.href = mailtoLink;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit enquiry');
+      }
 
       setSubmitStatus('success');
 
-      // Reset form after 3 seconds
+      // Reset form after 5 seconds
       setTimeout(() => {
         setFormData({
           name: '',
@@ -77,10 +62,15 @@ ${formData.message || 'None'}
           message: ''
         });
         setSubmitStatus('idle');
-      }, 3000);
-    } catch (error) {
+      }, 5000);
+    } catch (error: any) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
+
+      // Show error for 5 seconds then reset
+      setTimeout(() => {
+        setSubmitStatus('idle');
+      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -146,6 +136,28 @@ ${formData.message || 'None'}
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Enquiry Sent!</h3>
               <p className="text-lg text-gray-600">
                 Thank you for your interest! We'll contact you shortly with details about the hardcopy.
+              </p>
+            </div>
+          ) : submitStatus === 'error' ? (
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl">⚠️</span>
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Submission Failed</h3>
+              <p className="text-lg text-gray-600 mb-6">
+                We couldn't process your enquiry at this moment.
+              </p>
+              <button
+                onClick={() => setSubmitStatus('idle')}
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all"
+              >
+                Try Again
+              </button>
+              <p className="text-sm text-gray-500 mt-4">
+                Or email us directly at{' '}
+                <a href="mailto:support@simplequran.in" className="text-green-600 font-semibold hover:underline">
+                  support@simplequran.in
+                </a>
               </p>
             </div>
           ) : (
