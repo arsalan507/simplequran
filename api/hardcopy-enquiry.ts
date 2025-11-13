@@ -69,7 +69,7 @@ export default async function handler(
     console.error('Hardcopy enquiry error:', error);
     console.error('Full error:', JSON.stringify(error, null, 2));
     return res.status(500).json({
-      error: 'Failed to submit enquiry. Please try again or contact support@simplequran.in',
+      error: 'Failed to submit enquiry. Please try again or contact info.simplequran@gmail.com',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

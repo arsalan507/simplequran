@@ -441,7 +441,7 @@ export async function sendEnquiryEmail(enquiryData: {
   const totalPrice = 3500 * parseInt(enquiryData.quantity);
 
   const msg = {
-    to: 'support@simplequran.in',
+    to: 'info.simplequran@gmail.com',
     from: {
       email: FROM_EMAIL,
       name: FROM_NAME,

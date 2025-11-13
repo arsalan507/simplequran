@@ -155,8 +155,8 @@ const HardcopyEnquiryForm: React.FC = () => {
               </button>
               <p className="text-sm text-gray-500 mt-4">
                 Or email us directly at{' '}
-                <a href="mailto:support@simplequran.in" className="text-green-600 font-semibold hover:underline">
-                  support@simplequran.in
+                <a href="mailto:info.simplequran@gmail.com" className="text-green-600 font-semibold hover:underline">
+                  info.simplequran@gmail.com
                 </a>
               </p>
             </div>
