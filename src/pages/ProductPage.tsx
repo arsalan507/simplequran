@@ -6,6 +6,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import HardcopyEnquiryForm from '../components/HardcopyEnquiryForm';
+import EBookBenefits from '../components/EBookBenefits';
+import VersionComparison from '../components/VersionComparison';
 
 // Design variation selector
 type DesignVariation = 'minimalist' | 'bold' | 'warm' | 'classic' | 'magazine';
@@ -473,6 +475,12 @@ const ProductPage: React.FC<ProductPageProps> = ({ variant = 'minimalist' }) => 
           </div>
         </div>
       </div>
+
+      {/* Version Comparison Section */}
+      <VersionComparison />
+
+      {/* eBook Benefits Section */}
+      <EBookBenefits />
 
       {/* What's Included Section */}
       <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 py-20 overflow-hidden">
